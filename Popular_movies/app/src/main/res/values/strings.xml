@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">Popular_movies</string>
+    <string name="app_name">Popular movies</string>
+    <string name="action_settings">Settings</string>
+    <string name="pref_sort_label_popular">Popular</string>
+    <string name="pref_sort_label_topRated">Top Rated</string>
+    <string name="pref_sort_key" translatable="false">sort</string>
+    <string name="pref_sort_label">Sort type</string>
+    <string name="pref_sort_popular_value" translatable="false">popular</string>
+    <string name="pref_sort_topRated_value" translatable="false">top_rated</string>
+    <string name="results">results</string>
+    <string name="vote_average">vote_average</string>
+    <string name="poster_path">poster_path</string>
+    <string name="title">title</string>
+    <string name="overview">overview</string>
+    <string name="release_date">release_date</string>
+    <string name="movie_poster">Movie Poster</string>
 </resources>
