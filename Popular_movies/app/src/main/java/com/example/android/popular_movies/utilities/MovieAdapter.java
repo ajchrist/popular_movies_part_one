@@ -11,6 +11,8 @@ import com.example.android.popular_movies.R;
 import com.example.android.popular_movies.data.PopularMovie;
 import com.example.android.popular_movies.databinding.PopularMovieBinding;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 import java.util.List;
 
 // based on ForecastAdapter.java from sunshine project
@@ -18,7 +20,7 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder>{
 
-    private List<PopularMovie> mPopularMovies;
+    private List<PopularMovie> mPopularMovies = new ArrayList<>();
     private Context context;
 
     public MovieAdapter(Context context, MovieAdapterOnClickHandler clickHandler){
@@ -27,19 +29,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     }
 
-    public List<PopularMovie> popularMovies(){
-        return mPopularMovies;
-    }
-
     final private MovieAdapterOnClickHandler mClickHandler;
 
-    /**
-     * The interface that receives onClick messages.
-     */
     public interface MovieAdapterOnClickHandler {
         void onClick(PopularMovie movie);
     }
-
 
 
     @Override
@@ -64,9 +58,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public int getItemCount() {
-        if (mPopularMovies == null){
-            return 0;
-        }
         return mPopularMovies.size();
     }
 
@@ -74,7 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         ImageView mImageView = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
 
-        public MovieAdapterViewHolder(View view) {
+        MovieAdapterViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
         }

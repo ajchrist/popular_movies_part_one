@@ -1,39 +1,34 @@
 package com.example.android.popular_movies;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.android.popular_movies.data.PopularMovie;
-import com.example.android.popular_movies.databinding.ActivityMainBinding;
 import com.example.android.popular_movies.databinding.ActivityMoviesBinding;
 import com.example.android.popular_movies.utilities.MovieAdapter;
 import com.example.android.popular_movies.utilities.MovieNetworkUtil;
 import com.example.android.popular_movies.utilities.MovieParser;
-import com.squareup.picasso.Picasso;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +39,12 @@ import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 public class MainActivity extends AppCompatActivity implements
         LoaderCallbacks<List<PopularMovie>>,
         MovieAdapter.MovieAdapterOnClickHandler,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        SwipeRefreshLayout.OnRefreshListener{
 
     private MovieAdapter movieAdapter;
     private SharedPreferences mSharedPrefs;
-    private RecyclerView mRecyclerView;
-    private LoaderCallbacks<List<PopularMovie>> mCallback;
+    private ActivityMoviesBinding moviesBinding;
     private static final int MOVIE_LOADER_ID = 0;
 
     public SharedPreferences getSharedPrefs (){
@@ -59,18 +54,23 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movies);
-        mRecyclerView = (RecyclerView) findViewById(R.id.movie_recyclerview);
-        this.reorient();
         movieAdapter = new MovieAdapter(this, this);
-        mCallback = MainActivity.this;
-        mRecyclerView.setAdapter(movieAdapter);
+        setContentView(R.layout.activity_movies);
+        moviesBinding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
+        moviesBinding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                load();
+            }
+        });
+        this.reorient();
+        moviesBinding.movieRecyclerview.setAdapter(movieAdapter);
         setupSharedPreferences();
-        //this.load();
     }
 
     @Override
     protected void onPostResume() {
+        this.reorient();
         this.load();
         super.onPostResume();
     }
@@ -79,10 +79,10 @@ public class MainActivity extends AppCompatActivity implements
         GridLayoutManager mLayoutManager;
         if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
             mLayoutManager = new GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false);
-            mRecyclerView.setLayoutManager(mLayoutManager);
+            moviesBinding.movieRecyclerview.setLayoutManager(mLayoutManager);
         } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT){
             mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
-            mRecyclerView.setLayoutManager(mLayoutManager);
+            moviesBinding.movieRecyclerview.setLayoutManager(mLayoutManager);
         }
     }
 
@@ -91,15 +91,26 @@ public class MainActivity extends AppCompatActivity implements
         mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private void load() {
-        getSupportLoaderManager().destroyLoader(MOVIE_LOADER_ID);
-        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, mCallback);
+    public void load() {
+        if (this.isNetworkAvailable()) {
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, MainActivity.this);
+        } else {
+            moviesBinding.swipe.setRefreshing(false);
+            Toast.makeText(this, getString(R.string.not_connected_error), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.reconnect), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    //test if connected to internet
+    //https://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
     protected void onStart() {
-//        this.reorient();
-//        this.load();
         super.onStart();
     }
 
@@ -136,9 +147,16 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    //start activity that will show a single movie
     @Override
     public void onClick(PopularMovie movie) {
-
+        Intent startSingleMovieActivity = new Intent(this, SingleMovie.class);
+        startSingleMovieActivity.putExtra(getString(R.string.title), movie.getTitle());
+        startSingleMovieActivity.putExtra(getString(R.string.poster_path), movie.getImageURL());
+        startSingleMovieActivity.putExtra(getString(R.string.overview), movie.getDescription());
+        startSingleMovieActivity.putExtra(getString(R.string.release_date), movie.getReleaseDate());
+        startSingleMovieActivity.putExtra(getString(R.string.vote_average), movie.getVote_average());
+        startActivity(startSingleMovieActivity);
     }
 
     @Override
@@ -147,19 +165,17 @@ public class MainActivity extends AppCompatActivity implements
 
             Context context = MainActivity.this;
             List<PopularMovie> popularMovies;
-            //SharedPreferences preferences;
 
             @Override
             protected void onStartLoading() {
                 if (popularMovies != null) {
                     deliverResult(popularMovies);
                 }else {
-//                    mLoadingIndicator.setVisibility(View.VISIBLE);
                     forceLoad();
                 }
             }
 
-
+            @Override
             public void deliverResult(List<PopularMovie> popularMovies) {
                 this.popularMovies = popularMovies;
                 super.deliverResult(popularMovies);
@@ -184,18 +200,19 @@ public class MainActivity extends AppCompatActivity implements
                 return null;
             }
         };
-
     }
 
     @Override
     public void onLoadFinished(Loader<List<PopularMovie>> loader, List<PopularMovie> data) {
-        mRecyclerView.setVisibility(View.VISIBLE);
-
         movieAdapter.setmPopularMovies(data);
-        //getSupportLoaderManager().getLoader(MOVIE_LOADER_ID).deliverResult(movieAdapter.popularMovies());
+        moviesBinding.swipe.setRefreshing(false);
     }
 
     @Override
     public void onLoaderReset(Loader<List<PopularMovie>> loader) {
+    }
+
+    @Override
+    public void onRefresh() {
     }
 }

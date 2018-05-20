@@ -1,5 +1,6 @@
 package com.example.android.popular_movies.data;
 
+// POJO that holds a popular movie
 public class PopularMovie {
 
     private String title;
@@ -12,8 +13,13 @@ public class PopularMovie {
         this.title = title;
         this.description = description;
         this.vote_average = vote_average;
-        this.releaseDate = releaseDate;
+        this.releaseDate = reformatDate(releaseDate);
         this.imageURL = imageURL;
+    }
+
+    private String reformatDate(String date){
+        String[] oldDate = date.split("-");
+        return String.format("%s/%s/%s", oldDate[1], oldDate[2], oldDate[0]);
     }
 
     public String getTitle(){

@@ -5,13 +5,10 @@ package com.example.android.popular_movies.utilities;
 
 import android.content.Context;
 import android.net.Uri;
-
 import com.example.android.popular_movies.R;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -22,6 +19,7 @@ public class MovieNetworkUtil {
 
     private final static String POPULAR_URL = "http://api.themoviedb.org/3/movie/popular?api_key=<API_KEY>";
     private final static String TOP_RATED_URL = "http://api.themoviedb.org/3/movie/top_rated?api_key=<API_KEY>";
+
 
     public static JSONArray query(String setting, Context context) throws IOException, JSONException {
         URL url = null;
