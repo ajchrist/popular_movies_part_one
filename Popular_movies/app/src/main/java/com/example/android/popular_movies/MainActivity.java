@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(PopularMovie movie) {
         Intent startSingleMovieActivity = new Intent(this, SingleMovie.class);
+        startSingleMovieActivity.putExtra(getString(R.string.id), movie.getId());
         startSingleMovieActivity.putExtra(getString(R.string.title), movie.getTitle());
         startSingleMovieActivity.putExtra(getString(R.string.poster_path), movie.getImageURL());
         startSingleMovieActivity.putExtra(getString(R.string.overview), movie.getDescription());

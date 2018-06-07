@@ -8,8 +8,10 @@ public class PopularMovie {
     private double vote_average;
     private String releaseDate;
     private String imageURL;
+    private String id;
 
-    public PopularMovie(String title, String description, double vote_average, String releaseDate, String imageURL){
+    public PopularMovie(String id, String title, String description, double vote_average, String releaseDate, String imageURL){
+        this.id = id;
         this.title = title;
         this.description = description;
         this.vote_average = vote_average;
@@ -20,6 +22,10 @@ public class PopularMovie {
     private String reformatDate(String date){
         String[] oldDate = date.split("-");
         return String.format("%s/%s/%s", oldDate[1], oldDate[2], oldDate[0]);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getTitle(){

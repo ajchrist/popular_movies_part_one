@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--Adapted from forecast_list_item.xml from udacity's sunshine project-->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

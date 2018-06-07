@@ -37,6 +37,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".ReviewActivity"
+            android:label="@string/action_single_movie_review"
+            android:parentActivityName=".SingleMovie">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SingleMovie" />
+        </activity>
     </application>
 
 </manifest>

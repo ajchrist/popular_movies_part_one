@@ -7,19 +7,24 @@ import android.os.Bundle;
 import com.example.android.popular_movies.databinding.ActivitySingleMovieBinding;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // based off the detailactivty.java from sunshine
 // where a single day's weather is received and shown
 
 public class SingleMovie extends AppCompatActivity {
 
     private ActivitySingleMovieBinding mSingleMovie;
-    private String mTitle, mPosterPath, mOverview, mReleaseDate, mVoteAverage;
+    private String mId, mTitle, mPosterPath, mOverview, mReleaseDate, mVoteAverage;
+    private List<String> mReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSingleMovie = DataBindingUtil.setContentView(this, R.layout.activity_single_movie);
         Intent mStartingIntent = getIntent();
+        mId = mStartingIntent.getStringExtra(getString(R.string.id));
         mTitle = mStartingIntent.getStringExtra(getString(R.string.title));
         mPosterPath = mStartingIntent.getStringExtra(getString(R.string.poster_path));
         mOverview = mStartingIntent.getStringExtra(getString(R.string.overview));

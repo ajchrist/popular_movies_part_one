@@ -1,12 +1,14 @@
 package com.example.android.popular_movies.utilities;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.android.popular_movies.MainActivity;
 import com.example.android.popular_movies.R;
 import com.example.android.popular_movies.data.PopularMovie;
 import com.example.android.popular_movies.databinding.PopularMovieBinding;
@@ -58,6 +60,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public int getItemCount() {
+        if (mPopularMovies == null){
+            return 0;
+        }
         return mPopularMovies.size();
     }
 
